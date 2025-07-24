@@ -95,6 +95,7 @@ function writeGameDatabase(){
     let path13  = studyId + '/participantData/' + firebaseUserId1 + '/condition' + '/seedCondition';
     let path24  = studyId + '/participantData/' + firebaseUserId1 + '/condition' + '/teamingCondition';
     let path25 = studyId + '/participantData/' + firebaseUserId1 + '/condition' + '/teamingOrder';
+    let path26 = studyId + '/participantData/' + firebaseUserId1 + '/condition' + '/surveyOrder';
 
     // console.log("Writing to database");
     let path1   = studyId + '/participantData/' + firebaseUserId1 + '/block' + currentBlock + '/round' + currentRound + '/spawnData';
@@ -146,6 +147,7 @@ function writeGameDatabase(){
     // writeRealtimeDatabase(db1, path23, AIeventStream_offline);
     writeRealtimeDatabase(db1, path24, currentTeamingCondition);
     writeRealtimeDatabase(db1, path25, agentOrder);
+    writeRealtimeDatabase(db1, path26, currentSurveyCondition);
 }
 
 //************************************************ ENVIRONMENT INITIALIZATION ********************************************//
