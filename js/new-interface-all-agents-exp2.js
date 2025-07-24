@@ -643,7 +643,7 @@ async function initExperimentSettings() {
     const numSurveyDraws            = 1;
     const assignedSurveyCondition   = await blockRandomization(db1, studyId, surveyOrderCondition, numSurveyConditions, maxCompletionTimeMinutes, numSurveyDraws);
 
-    currentSurveyCondition =  assignedSurveyCondition;// ssignedSurveyCondition[0]+1;
+    currentSurveyCondition = assignedSurveyCondition[0]+1;
     console.log("survey condition", currentSurveyCondition);
 
     difficultySettings = updateDifficultySettings();
