@@ -643,7 +643,7 @@ async function initExperimentSettings() {
     const numSurveyDraws            = 1;
     const assignedSurveyCondition   = await blockRandomization(db1, studyId, surveyOrderCondition, numSurveyConditions, maxCompletionTimeMinutes, numSurveyDraws);
 
-    currentSurveyCondition =  1;// ssignedSurveyCondition[0]+1;
+    currentSurveyCondition =  assignedSurveyCondition;// ssignedSurveyCondition[0]+1;
     console.log("survey condition", currentSurveyCondition);
 
     difficultySettings = updateDifficultySettings();
@@ -3405,6 +3405,7 @@ async function loadAIopenEndedFeedback() {
                 $("#complete-page-content-container").attr("hidden", false);
                 finalizeBlockRandomization(db1, studyId, blockOrderCondition);
                 finalizeBlockRandomization(db1, studyId, teamingBlockCondition);
+                finalizeBlockRandomization(db1, studyId, surveyOrderCondition);
                 await loadCompletePage();
             } else {
                 // update AI order settings
