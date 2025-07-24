@@ -663,10 +663,10 @@ async function initExperimentSettings() {
         currentCondition = 5;
     }
 
-    return [blockOrderCondition, teamingBlockCondition];
+    return [blockOrderCondition, teamingBlockCondition, surveyOrderCondition];
 }
 
-let blockOrderCondition, teamingBlockCondition;
+let blockOrderCondition, teamingBlockCondition, surveyOrderCondition;
 let conditionsArray = [];
 // Assign a condition to each new participant.
 if (noAssignment){
@@ -674,6 +674,7 @@ if (noAssignment){
         conditionsArray = await initExperimentSettings();
         blockOrderCondition = conditionsArray[0];
         teamingBlockCondition = conditionsArray[1];
+        surveyOrderCondition = conditionsArray[2];
         // conditionsArray = await initExperimentSettings();
         
         // check if the initExperimentSettings double call explains the misfunc
