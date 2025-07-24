@@ -74,7 +74,7 @@ let studyId = 'placeHolder';
 if (DEBUG){
    studyId    = "collab-exp2-debug";
 } else {
-    studyId   = "collab-exp2";
+    studyId   = "collab-exp2-pilot";
 }
 
 // WRITE PROLIFIC PARTICIPANT DATA TO DB1
