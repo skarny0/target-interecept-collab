@@ -124,7 +124,7 @@ function writeGameDatabase(){
 
     writeRealtimeDatabase(db1, path1, spawnData);
     writeRealtimeDatabase(db1, path2, caughtTargets);
-    // writeRealtimeDatabase(db1, path3, eventStream); 
+    writeRealtimeDatabase(db1, path3, eventStream); 
     writeRealtimeDatabase(db1, path4, playerClicks);
     writeRealtimeDatabase(db1, path5, playerLocation);
     writeRealtimeDatabase(db1, path6, roundSettings);
@@ -138,13 +138,13 @@ function writeGameDatabase(){
     // writeRealtimeDatabase(db1, path14, aiClicks_adjusted);
     // writeRealtimeDatabase(db1, path15, drtResponses);
     // writeRealtimeDatabase(db1, path16, drtFalseAlarm);
-    // writeRealtimeDatabase(db1, path17, AIeventStream);
+    writeRealtimeDatabase(db1, path17, AIeventStream);
     writeRealtimeDatabase(db1, path18, AIcaughtTargets_offline);
     writeRealtimeDatabase(db1, path19, aiClicks_offline);
     writeRealtimeDatabase(db1, path20, aiScore_offline);
     // writeRealtimeDatabase(db1, path21, AIplayerLocation_offline);
     // writeRealtimeDatabase(db1, path22, AIplayerLocation);
-    // writeRealtimeDatabase(db1, path23, AIeventStream_offline);
+    writeRealtimeDatabase(db1, path23, AIeventStream_offline);
     writeRealtimeDatabase(db1, path24, currentTeamingCondition);
     writeRealtimeDatabase(db1, path25, agentOrder);
     writeRealtimeDatabase(db1, path26, currentSurveyCondition);
