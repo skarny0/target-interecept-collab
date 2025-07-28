@@ -74,7 +74,7 @@ let studyId = 'placeHolder';
 if (DEBUG){
    studyId    = "collab-exp2-debug";
 } else {
-    studyId   = "collab-exp2-pilot-jul24";
+    studyId   = "collab-exp2-pilot-Jul28";
 }
 
 // WRITE PROLIFIC PARTICIPANT DATA TO DB1
@@ -444,7 +444,7 @@ let drtLightChoice      = 0; // random choice of light to display
 
 let maxFrames = null;
 if (DEBUG){
-    maxFrames         = 3 * fps;// settings.maxSeconds * fps;
+    maxFrames         = 10 * fps;// settings.maxSeconds * fps;
 } else{ // set it to whatever you want
     maxFrames         = settings.maxSeconds * fps; //120 * 60; // Two minutes in frames
 }
@@ -644,6 +644,7 @@ async function initExperimentSettings() {
     const assignedSurveyCondition   = await blockRandomization(db1, studyId, surveyOrderCondition, numSurveyConditions, maxCompletionTimeMinutes, numSurveyDraws);
 
     currentSurveyCondition = assignedSurveyCondition[0]+1;
+    // currentSurveyCondition = 1;
     console.log("survey condition", currentSurveyCondition);
 
     difficultySettings = updateDifficultySettings();
