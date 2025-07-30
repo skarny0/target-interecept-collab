@@ -38,13 +38,23 @@ import { writeRealtimeDatabase,writeURLParameters,readRealtimeDatabase,
 //   };
 
 // Your web app's Firebase configuration
+// const firebaseConfig_db1 = {
+//     apiKey: "AIzaSyD1fJXd14fcxUDCb-8MUAMSThcR1e5i7FE",
+//     authDomain: "collab-ai-full-39f84.firebaseapp.com",
+//     projectId: "collab-ai-full-39f84",
+//     storageBucket: "collab-ai-full-39f84.appspot.com",
+//     messagingSenderId: "535805184208",
+//     appId: "1:535805184208:web:2af9ae4c07c035e4c8b6d5"
+// };
+
 const firebaseConfig_db1 = {
-    apiKey: "AIzaSyD1fJXd14fcxUDCb-8MUAMSThcR1e5i7FE",
-    authDomain: "collab-ai-full-39f84.firebaseapp.com",
-    projectId: "collab-ai-full-39f84",
-    storageBucket: "collab-ai-full-39f84.appspot.com",
-    messagingSenderId: "535805184208",
-    appId: "1:535805184208:web:2af9ae4c07c035e4c8b6d5"
+    apiKey: "AIzaSyB9jFpk1axkFKviC9Le7Kme2z6IoOnLjPc",
+    authDomain: "collab-ai-revisions.firebaseapp.com",
+    databaseURL: "https://collab-ai-revisions-default-rtdb.firebaseio.com", // Add this line
+    projectId: "collab-ai-revisions",
+    storageBucket: "collab-ai-revisions.firebasestorage.app",
+    messagingSenderId: "366974348151",
+    appId: "1:366974348151:web:8e8a3786482eb761e68f72"
 };
   
 // Get the reference to the two databases using the configuration files
@@ -83,9 +93,9 @@ var COLLAB = getCollabTypeParams(); // 0=ignorant; 1=omit; 2=divide; 3=delay
 let studyId = 'placeHolder';
 
 if (DEBUG){
-   studyId    = "uci-hri-experiment-collab-aug13-DEBUG";
+   studyId    = "collab-exp1-jul30-DEBUG";
 } else {
-    studyId   = "uci-hri-experiment-collab-aug13";
+    studyId   = "collab-exp1-jul30";
 }
 
 // WRITE PROLIFIC PARTICIPANT DATA TO DB1
@@ -443,7 +453,7 @@ let drtLightChoice      = 0; // random choice of light to display
 
 let maxFrames = null;
 if (DEBUG){
-    maxFrames         = 60 * fps;// settings.maxSeconds * fps;
+    maxFrames         = 3 * fps;// settings.maxSeconds * fps;
 } else{ // set it to whatever you want
     maxFrames         = settings.maxSeconds * fps; //120 * 60; // Two minutes in frames
 }

@@ -72,7 +72,7 @@ var COLLAB = getCollabTypeParams(); // 0=ignorant; 1=omit; 2=divide; 3=delay
 let studyId = 'placeHolder';
 
 if (DEBUG){
-   studyId    = "collab-exp2-debug";
+   studyId    = "collab-exp2-debug-jul30";
 } else {
     studyId   = "collab-exp2-pilot-Jul28";
 }
@@ -83,11 +83,6 @@ writeURLParameters(db1, pathnow);
 
 // database write function
 function writeGameDatabase(){
-    // Connecting to the sister database
-    // let pathUID1 = studyId + '/participantData/' + firebaseUserId2 + '/keyUID';
-    // let pathUID2 = studyId + '/participantData/' + firebaseUserId1 + '/keyUID';
-    // writeRealtimeDatabase(db2, pathUID1, firebaseUserId1);
-    // writeRealtimeDatabase(db1, pathUID2, firebaseUserId2);
 
     if (DEBUG) console.log("Writing to database from block", currentBlock, "round", currentRound);
 
@@ -271,15 +266,6 @@ let teamingSettings = {
         AICollab2 : 2}          // divide,
 };
 
-// e.g. likertordersettings.survey1 == 0, means that the likert questionnaire comes first then the choice; 
-// survey == 1 means that the choice comes first then the likert questionnaire
-let likertOrderSettings = {
-    1: {survey1: 0, survey2: 1},  // First survey: likert, Second survey: choice
-    2: {survey1: 1, survey2: 0},  // First survey: choice, Second survey: likert
-    3: {survey1: 0, survey2: 0},  // Both surveys: likert first
-    4: {survey1: 1, survey2: 1}   // Both surveys: choice first
-}
-
 let difficultySettings = {
     // 5 targets first
     1: {0: {1: {AICollab: collabPlayer1,     // Pair A
@@ -444,7 +430,7 @@ let drtLightChoice      = 0; // random choice of light to display
 
 let maxFrames = null;
 if (DEBUG){
-    maxFrames         = 10 * fps;// settings.maxSeconds * fps;
+    maxFrames         = 3 * fps;// settings.maxSeconds * fps;
 } else{ // set it to whatever you want
     maxFrames         = settings.maxSeconds * fps; //120 * 60; // Two minutes in frames
 }
@@ -660,9 +646,9 @@ async function initExperimentSettings() {
 
     curSeeds = randomValues;
 
-    if (DEBUG){
-        currentCondition = 5;
-    }
+    // if (DEBUG){
+    //     currentCondition = 5;
+    // }
 
     return [blockOrderCondition, teamingBlockCondition, surveyOrderCondition];
 }
@@ -775,6 +761,8 @@ async function startGame(round, condition, block, seeds) {
 async function endGame() {
     isGameRunning = false;
 
+
+    
     writeGameDatabase();
 
     if (currentRound < maxRounds) {//&& numSurveyCompleted < 3) {
@@ -3326,8 +3314,7 @@ async function loadAIComparison() {
                     $("#ai-open-ended-feedback-container").attr("hidden", false);
                     
                 } else if (currentSurveyCondition == 2){ // 
-                    let prevBlock = 1;
-                    await loadFullSurvey(prevBlock);
+                    await loadFullSurvey();
                     $("#survey-full-container").attr("hidden", false);
                 }
                 
@@ -3426,7 +3413,7 @@ async function loadAIopenEndedFeedback() {
 // we must pass the previous survey in order to properly iterate on the number of surveys completed 
 // this must occur conditionally on the surveyOrderCondition and the number of previous surveys completed.
 
-async function loadFullSurvey(prevBlock=0){
+async function loadFullSurvey(){
     var DEBUG_SURVEY = DEBUG;
     var TOPIC_FULL_DICT = {
         "agent1": {},
