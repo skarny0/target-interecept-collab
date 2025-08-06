@@ -666,6 +666,30 @@ function writeConsoleLogsToFirebase() {
         consoleLogs = []; // Clear logs after writing
     }
 }
+
+// Capture uncaught JavaScript errors
+window.addEventListener('error', function(event) {
+    const timestamp = new Date().toISOString();
+    consoleLogs.push({
+        level: 'error',
+        timestamp: timestamp,
+        message: `UNCAUGHT ERROR: ${event.message} at ${event.filename}:${event.lineno}:${event.colno}`,
+        stack: event.error ? event.error.stack : 'No stack trace available'
+    });
+    writeConsoleLogsToFirebase(); // Immediately write critical errors
+});
+
+// Capture unhandled Promise rejections
+window.addEventListener('unhandledrejection', function(event) {
+    const timestamp = new Date().toISOString();
+    consoleLogs.push({
+        level: 'error',
+        timestamp: timestamp,
+        message: `UNHANDLED PROMISE REJECTION: ${event.reason}`,
+        stack: event.reason && event.reason.stack ? event.reason.stack : 'No stack trace available'
+    });
+    writeConsoleLogsToFirebase(); // Immediately write critical errors
+});
 //**************************************************** BLOCK RANDOMIZATION ******************************************************//
 
 async function initExperimentSettings() {
