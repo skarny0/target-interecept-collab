@@ -72,7 +72,7 @@ var COLLAB = getCollabTypeParams(); // 0=ignorant; 1=omit; 2=divide; 3=delay
 let studyId = 'placeHolder';
 
 if (DEBUG){
-   studyId    = "collab-exp2-debug-jul30";
+   studyId    = "collab-exp2-debug-aug6";
 } else {
     studyId   = "collab-exp2-aug6";
 }
@@ -85,6 +85,9 @@ writeURLParameters(db1, pathnow);
 function writeGameDatabase(){
 
     if (DEBUG) console.log("Writing to database from block", currentBlock, "round", currentRound);
+    
+    // Write console logs to Firebase during game data writes
+    writeConsoleLogsToFirebase();
 
     let path12  = studyId + '/participantData/' + firebaseUserId1 + '/condition' + '/blockCondition';
     let path13  = studyId + '/participantData/' + firebaseUserId1 + '/condition' + '/seedCondition';
@@ -597,6 +600,72 @@ let visitedBlocks = 0;
 let numSurveyCompleted = 0;
 let AIComparisonComplete = false;
 let prevSetting;
+let blockInfo = {
+    completedBlock: 0,
+    completedBlockOrder: []
+};
+
+// Console logging system
+let consoleLogs = [];
+let originalConsoleLog = console.log;
+let originalConsoleError = console.error;
+let originalConsoleWarn = console.warn;
+
+// Override console methods to capture logs
+console.log = function(...args) {
+    const timestamp = new Date().toISOString();
+    const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' ');
+    consoleLogs.push({
+        level: 'log',
+        timestamp: timestamp,
+        message: message
+    });
+    originalConsoleLog.apply(console, args);
+};
+
+console.error = function(...args) {
+    const timestamp = new Date().toISOString();
+    const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' ');
+    consoleLogs.push({
+        level: 'error',
+        timestamp: timestamp,
+        message: message
+    });
+    originalConsoleError.apply(console, args);
+};
+
+console.warn = function(...args) {
+    const timestamp = new Date().toISOString();
+    const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' ');
+    consoleLogs.push({
+        level: 'warn',
+        timestamp: timestamp,
+        message: message
+    });
+    originalConsoleWarn.apply(console, args);
+};
+
+// Function to write console logs to Firebase
+function writeConsoleLogsToFirebase() {
+    if (consoleLogs.length > 0) {
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const path = studyId + '/participantData/' + firebaseUserId1 + '/consoleLogs/' + timestamp;
+        writeRealtimeDatabase(db1, path, {
+            logs: consoleLogs,
+            sessionInfo: {
+                userAgent: navigator.userAgent,
+                timestamp: new Date().toISOString(),
+                currentBlock: currentBlock,
+                currentRound: currentRound,
+                numSurveyCompleted: numSurveyCompleted,
+                currentSurveyCondition: currentSurveyCondition,
+                visitedBlocks: visitedBlocks
+            }
+        });
+        console.log("Console logs written to Firebase:", consoleLogs.length, "entries");
+        consoleLogs = []; // Clear logs after writing
+    }
+}
 //**************************************************** BLOCK RANDOMIZATION ******************************************************//
 
 async function initExperimentSettings() {
@@ -773,7 +842,8 @@ async function endGame() {
         // All rounds in the current block are completed
         blockInfo.completedBlock++;
         blockInfo.completedBlockOrder.push(currentBlock);
-        console.log("Visited Blocks", visitedBlocks);
+        console.log("BLOCK COMPLETED - visitedBlocks:", visitedBlocks, "blockInfo.completedBlock:", blockInfo.completedBlock, "currentSurveyCondition:", currentSurveyCondition);
+        writeConsoleLogsToFirebase();
         currentRound = 1; // Reset the round counter
         currentBlock += 1; // Move to next block
        
@@ -3285,8 +3355,10 @@ async function loadAIComparison() {
 
             if (currentSurveyCondition == 2 && blockInfo.completedBlock == 1){
                 numSurveyCompleted++;
+                console.log("AI COMPARISON INCREMENT - condition 2, block 1, numSurveyCompleted:", numSurveyCompleted);
             } else if (currentSurveyCondition == 1 && blockInfo.completedBlock == 2){
                 numSurveyCompleted++;
+                console.log("AI COMPARISON INCREMENT - condition 1, block 2, numSurveyCompleted:", numSurveyCompleted);
             }
             
             if (numSurveyCompleted == 1) {
@@ -3374,6 +3446,9 @@ async function loadAIopenEndedFeedback() {
 
             if (numSurveyCompleted == 2) {
                 // push them to the final page of the experiment which redirects participants
+                console.log("EXPERIMENT COMPLETE - Final survey sequence finished, currentSurveyCondition:", currentSurveyCondition, "blockInfo.completedBlock:", blockInfo.completedBlock);
+                writeConsoleLogsToFirebase();
+                
                 $("#ai-open-ended-feedback-container").attr("hidden", true);
                 $("#task-header").attr("hidden", true);
                 $("#exp-complete-header").attr("hidden", false);
@@ -3489,8 +3564,10 @@ async function loadFullSurvey(){
         // think about how we track numSurveyCompleted
         if (currentSurveyCondition == 1 && blockInfo.completedBlock == 1){
             numSurveyCompleted++;
+            console.log("FULL SURVEY INCREMENT - condition 1, block 1, numSurveyCompleted:", numSurveyCompleted);
         } else if (currentSurveyCondition == 2 && blockInfo.completedBlock == 2){
             numSurveyCompleted++;
+            console.log("FULL SURVEY INCREMENT - condition 2, block 2, numSurveyCompleted:", numSurveyCompleted);
         }
         
         let path;
@@ -3531,140 +3608,6 @@ async function loadFullSurvey(){
 
     // Initial check in case the form is pre-filled
     checkAllAnswered();
-}
-
-function loadWorkLoadSurvey(){
-    var DEBUG_SURVEY                    = DEBUG;
-    //      Survey Information
-    var TOPIC_Workload_DICT = {
-        "q01"  : null,
-        "q02"  : null,
-        "q03"  : null,
-    };
-    var TOPICS_RANKED = 0;
-
-    // Clear previous inputs
-    // $('.likert-topic-workload li input').val('');
-    $('.likert-topic-workload li input').prop('checked', false);
-
-    /******************************************************************************
-        RUN ON PAGE LOAD
-
-            Run the following functions as soon as the page is loaded. This will
-            render the consent.html page appropriately.
-    ******************************************************************************/
-
-    $(document).ready(function (){
-        /******************************************************************************
-            FUNCTIONALITY
-
-                All functions that will be used for the survey page.
-        ******************************************************************************/
-        /*
-            Function to control Radio Button Selection
-        */
-        function likertTopicAbility() {
-            /*
-                Radio Button Selection Contoller.
-
-                Only one likert option can be selected for each topic.
-                Keep count of how many topics have been ranked. Once all topics
-                have been ranked, then the submit button can become enabled.
-            */
-            // Retrieve the current topic that was ranked
-            let topic_currently_ranked = $(this).attr("name");
-
-            // Determine is that topic has been ranked before or not
-            if (TOPIC_Workload_DICT[topic_currently_ranked] == null) {
-                // If the topic hasn't bee ranked before, increment counter
-                TOPICS_RANKED++;
-            }
-
-            // Set selection variable
-            TOPIC_Workload_DICT[topic_currently_ranked] = Number($(this).val());
-
-            // if (TOPICS_RANKED == 10) {
-            //     // Enable "Submit" button
-            //     $('#survey-complete-button').prop('disabled', false);
-            //     console.log("All topics ranked");
-            // }
-
-            var allClicked = true;
-            $('.likert-topic-workload').each(function() {
-                if ($(this).find('input:checked').length === 0) {
-                    allClicked = false;
-                    return false; // Exit the loop
-                }
-            });
-
-            // Enable the submit button if all likert buttons have been clicked
-            if (allClicked) {
-                $('#survey-complete-button-workload').prop('disabled', false);
-                // console.log("All topics ranked");
-            }
-
-
-            if (DEBUG_SURVEY) {
-                console.log(
-                    "Radio Button Selected\n:",
-                    "    Topic :", topic_currently_ranked,
-                    "    Value :", TOPIC_Workload_DICT[topic_currently_ranked]
-                );
-                console.log(
-                    $(this).attr("name")
-                );
-            }
-        };
-
-        async function completeExperiment() {
-            /*
-                When submit button is clicked (after ranking), experiment is done.
-
-                This will submit the final rankings and then load the
-                "Experiment Complete" page.
-            */
-            let SURVEY_END_TIME = new Date();
-
-            numSurveyCompleted++;
-            
-            if (numSurveyCompleted == 1) {
-                let path = studyId + '/participantData/' + firebaseUserId1 + '/selfAssessment/workload1' ;
-                writeRealtimeDatabase(db1, path, TOPIC_Workload_DICT);
-            } else if (numSurveyCompleted == 2) {
-                let path = studyId + '/participantData/' + firebaseUserId1 + '/selfAssessment/workload2' ;
-                writeRealtimeDatabase(db1, path, TOPIC_Workload_DICT);
-            } else {
-                let path = studyId + '/participantData/' + firebaseUserId1 + '/selfAssessment/workload3' ;
-                writeRealtimeDatabase(db1, path, TOPIC_Workload_DICT);
-            }
-
-            if (numSurveyCompleted == 3) {
-                // push them to the final page of the experiment which redirects participants
-                // await runGameSequence("Congratulations on Finishing the Main Experiment! Click OK to Continue to the Feedback Survey.");
-                finalizeBlockRandomization(db1, studyId, currentCondition);
-                // finalizeBlockRandomization(db1, studyId, curSeeds);
-                $("#survey-workload-container").attr("hidden", true);
-                $("#task-header").attr("hidden", true);
-                $("#exp-complete-header").attr("hidden", false);
-                $("#complete-page-content-container").attr("hidden", false);
-                await loadCompletePage();
-                // $('#task-complete').load('html/complete.html');
-            } else{
-                $("#survey-workload-container").attr("hidden", true);
-                // $("#survey-workload-container").remove();
-                $("#full-game-container").attr("hidden", false);
-                // resizeScoreCanvas()
-            }
-
-            // console.log("Submit Button Clicked");
-        }
-
-        //  Handle Likert Selection for ALL Topics
-        $('.likert-topic-workload li input').click(likertTopicAbility);
-
-        //  Handle Submitting Survey
-        $('#survey-complete-button-workload').off().click(completeExperiment);
-    });
 }
 
 //*************************************************** COMPLETE -- REDIRECT ************************************************//
