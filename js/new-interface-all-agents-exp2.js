@@ -430,7 +430,7 @@ let drtLightChoice      = 0; // random choice of light to display
 
 let maxFrames = null;
 if (DEBUG){
-    maxFrames         = 3 * fps;// settings.maxSeconds * fps;
+    maxFrames         = 10 * fps;// settings.maxSeconds * fps;
 } else{ // set it to whatever you want
     maxFrames         = settings.maxSeconds * fps; //120 * 60; // Two minutes in frames
 }
@@ -761,8 +761,6 @@ async function startGame(round, condition, block, seeds) {
 async function endGame() {
     isGameRunning = false;
 
-
-    
     writeGameDatabase();
 
     if (currentRound < maxRounds) {//&& numSurveyCompleted < 3) {
@@ -785,40 +783,34 @@ async function endGame() {
         visitedBlocks++;
 
         if (visitedBlocks == 1) {
-            // prevSetting = settings
+
             if (currentSurveyCondition == 1){
-                // load likertChoice
-                await loadFullSurvey(); // pass the survey condition to point to the correct next function
+
+                await loadFullSurvey();
                 $("#survey-full-container").attr("hidden", false);
             } else if (currentSurveyCondition == 2) {
-                // load choiceLikert 
+
                 await loadAIComparison()
                 $("#ai-comparison-container").attr("hidden", false);
             }
-            // await loadFullSurvey();
-            // $("#survey-full-container").attr("hidden", false);
-            // await loadAIComparison();
-            // $("#ai-comparison-container").attr("hidden", false);
+
             $("#full-game-container").attr("hidden", true);
         }
     
         if (visitedBlocks < 2) {
             startGame(currentRound, currentCondition,currentBlock,curSeeds); // Start the next round
         } else{
-            // console.log("End of Experiment");
-            if (currentSurveyCondition == 1){
+            // send condition to correct first survey section, progression to next surveys happens there after
+            if (currentSurveyCondition == 1){ // block 2, first survey is choice
                 await loadAIComparison()
                 $("#ai-comparison-container").attr("hidden", false);
-            } else if (currentSurveyCondition == 2) {
-                await loadFullSurvey(); // pass the survey condition to point to the correct next function
+            } else if (currentSurveyCondition == 2) { // block 2, first survey is likert
+                await loadFullSurvey(); 
                 $("#survey-full-container").attr("hidden", false);
             }
-            // await loadFullSurvey();
-            // $("#survey-full-container").attr("hidden", false);
-            // loadAIComparison();
-            // $("#ai-comparison-container").attr("hidden", false);
+            
             $("#full-game-container").attr("hidden", true);
-            if (DEBUG) console.log("Agent order", agentOrder); 
+            if (DEBUG) console.log("Agent order", agentOrder);
         }
     }
 }
@@ -3215,14 +3207,11 @@ async function loadAIComparison() {
         "selectedAI": null,
     };
 
-    // Clear previous inputs
-    // Clear previous inputs and classes
+    // Clear previous inputs and classes to allow for new inputs
     $('#ai-1-button').removeClass('robot-button-selected robot-button-iron robot-button-copper robot-button-green robot-button-purple robot-button-brown robot-button-blue');
     $('#ai-2-button').removeClass('robot-button-selected robot-button-iron robot-button-copper robot-button-green robot-button-purple robot-button-brown robot-button-blue');
     $('#survey-complete-button-comparison').prop('disabled', true);
-    // $('#ai-1-button').removeClass('robot-button-selected');
-    // $('#ai-2-button').removeClass('robot-button-selected');
-    // $('#survey-complete-button-comparison').prop('disabled', true);
+  
 
      // max targets is 5 first, then 15
      if (visitedBlocks == 1 && currentCondition <= 4) { // takse us to the correct survey ... 
@@ -3231,7 +3220,6 @@ async function loadAIComparison() {
         $('#ai-1-button').next('figcaption').text('Green-Bot');
         $('#ai-2-button').next('figcaption').text('Purple-Bot');
     } else if (visitedBlocks == 2 && currentCondition <= 4 ) {
-        // $('#ai-1-button').addClass('robot-button-iron');
         $('#ai-1-button').addClass('robot-button-blue');
         $('#ai-2-button').addClass('robot-button-copper');
         $('#ai-1-button').next('figcaption').text('Blue-Bot');
@@ -3240,7 +3228,6 @@ async function loadAIComparison() {
 
     // max targets is 15 first, then 5
     if (visitedBlocks == 1 && currentCondition > 4) { // takes us to the correct survey
-        // $('#ai-1-button').addClass('robot-button-iron');
         $('#ai-1-button').addClass('robot-button-blue');
         $('#ai-2-button').addClass('robot-button-copper');
         $('#ai-1-button').next('figcaption').text('Blue-Bot');
@@ -3254,7 +3241,6 @@ async function loadAIComparison() {
 
 
     $(document).ready(function () {
-       
 
         function handleAISelection() {
             /*
