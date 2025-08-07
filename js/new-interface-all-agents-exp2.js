@@ -3405,10 +3405,10 @@ async function loadAIComparison() {
             // AIComparisonComplete = True
 
             if (currentSurveyCondition == 2 && blockInfo.completedBlock == 1){
-                numSurveyCompleted++;
+                numSurveyCompleted = 1;
                 console.log("AI COMPARISON INCREMENT - condition 2, block 1, numSurveyCompleted:", numSurveyCompleted);
             } else if (currentSurveyCondition == 1 && blockInfo.completedBlock == 2){
-                numSurveyCompleted++;
+                numSurveyCompleted = 2;
                 console.log("AI COMPARISON INCREMENT - condition 1, block 2, numSurveyCompleted:", numSurveyCompleted);
             }
             
@@ -3614,10 +3614,10 @@ async function loadFullSurvey(){
 
         // think about how we track numSurveyCompleted
         if (currentSurveyCondition == 1 && blockInfo.completedBlock == 1){
-            numSurveyCompleted++;
+            numSurveyCompleted = 1;
             console.log("FULL SURVEY INCREMENT - condition 1, block 1, numSurveyCompleted:", numSurveyCompleted);
         } else if (currentSurveyCondition == 2 && blockInfo.completedBlock == 2){
-            numSurveyCompleted++;
+            numSurveyCompleted = 2;
             console.log("FULL SURVEY INCREMENT - condition 2, block 2, numSurveyCompleted:", numSurveyCompleted);
         }
         
