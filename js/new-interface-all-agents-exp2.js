@@ -649,20 +649,47 @@ console.warn = function(...args) {
 function writeConsoleLogsToFirebase() {
     if (consoleLogs.length > 0) {
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        const path = studyId + '/participantData/' + firebaseUserId1 + '/consoleLogs/' + timestamp;
-        writeRealtimeDatabase(db1, path, {
-            logs: consoleLogs,
-            sessionInfo: {
-                userAgent: navigator.userAgent,
-                timestamp: new Date().toISOString(),
-                currentBlock: currentBlock,
-                currentRound: currentRound,
-                numSurveyCompleted: numSurveyCompleted,
-                currentSurveyCondition: currentSurveyCondition,
-                visitedBlocks: visitedBlocks
-            }
-        });
-        console.log("Console logs written to Firebase:", consoleLogs.length, "entries");
+        
+        // Separate errors from regular logs
+        const errors = consoleLogs.filter(log => log.level === 'error');
+        const regularLogs = consoleLogs.filter(log => log.level !== 'error');
+        
+        // Write regular logs
+        if (regularLogs.length > 0) {
+            const path = studyId + '/participantData/' + firebaseUserId1 + '/consoleLogs/' + timestamp;
+            writeRealtimeDatabase(db1, path, {
+                logs: regularLogs,
+                sessionInfo: {
+                    userAgent: navigator.userAgent,
+                    timestamp: new Date().toISOString(),
+                    currentBlock: currentBlock,
+                    currentRound: currentRound,
+                    numSurveyCompleted: numSurveyCompleted,
+                    currentSurveyCondition: currentSurveyCondition,
+                    visitedBlocks: visitedBlocks
+                }
+            });
+        }
+        
+        // Write errors to separate path for easy access
+        if (errors.length > 0) {
+            const errorPath = studyId + '/participantData/' + firebaseUserId1 + '/errors/' + timestamp;
+            writeRealtimeDatabase(db1, errorPath, {
+                errors: errors,
+                errorCount: errors.length,
+                sessionInfo: {
+                    userAgent: navigator.userAgent,
+                    timestamp: new Date().toISOString(),
+                    currentBlock: currentBlock,
+                    currentRound: currentRound,
+                    numSurveyCompleted: numSurveyCompleted,
+                    currentSurveyCondition: currentSurveyCondition,
+                    visitedBlocks: visitedBlocks
+                }
+            });
+        }
+        
+        console.log("Console logs written to Firebase:", regularLogs.length, "regular,", errors.length, "errors");
         consoleLogs = []; // Clear logs after writing
     }
 }
