@@ -72,9 +72,9 @@ var COLLAB = getCollabTypeParams(); // 0=ignorant; 1=omit; 2=divide; 3=delay
 let studyId = 'placeHolder';
 
 if (DEBUG){
-   studyId    = "collab-exp2-debug-aug6";
+   studyId    = "collab-exp2-debug-aug7";
 } else {
-    studyId   = "collab-exp2-aug6";
+    studyId   = "collab-exp2-aug7";
 }
 
 // WRITE PROLIFIC PARTICIPANT DATA TO DB1
